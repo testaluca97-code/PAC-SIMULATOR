@@ -114,7 +114,7 @@ def fetch_5y_metrics(ticker: str):
         )
 
     # Media annua (ultimi 5 anni solari completi)
-    annual = df["Close"].resample("Y").last().pct_change().dropna()
+    annual = df["Close"].resample("YE").last().pct_change().dropna()
     last5 = annual.tail(5)
     avg_arith = float(last5.mean()) if len(last5) > 0 else np.nan
 
@@ -270,7 +270,7 @@ def fetch_5y_annual_returns_series(ticker: str):
     df = yf.download(resolved, period="6y", interval="1d", auto_adjust=True, progress=False)
     if df is None or df.empty:
         return pd.Series(dtype=float)
-    annual = df["Close"].resample("Y").last().pct_change().dropna()
+    annual = df["Close"].resample("YE").last().pct_change().dropna()
     return annual.tail(5)
 
 
@@ -411,7 +411,7 @@ with st.sidebar:
         etf_df = st.data_editor(
             default_df,
             num_rows="dynamic",
-            use_container_width=True,
+            width='stretch',
             key="etf_editor",
         )
         # st.caption("Suggerimento: indica il **ticker con suffisso della borsa** — es. *VNGA40.MI* (Borsa Italiana), *V40A.DE* (Xetra).")
@@ -506,7 +506,7 @@ with st.sidebar:
     mc_band    = st.selectbox("Banda confidenza", ["5–95%", "10–90%"], index=1, disabled=not mc_enabled)
     mc_seed    = st.number_input("Seed casuale", min_value=0, value=42, step=1, disabled=not mc_enabled)
 
-    run = st.button("🚀 Esegui simulazione", use_container_width=True, type="primary")
+    run = st.button("🚀 Esegui simulazione", width='stretch', type="primary")
 
 # -----------------------------
 # Run simulation
@@ -618,7 +618,7 @@ if run:
             tmp["CAGR (≈5Y)"] = tmp["CAGR (≈5Y)"]*100
             tmp["CAGR (≈5Y)"] = tmp["CAGR (≈5Y)"].map(lambda x: f"{x:.2f}%")
             tmp["Anni osservati"] = tmp["Anni osservati"].map(lambda x: f"{x:.0f}")
-            st.dataframe(tmp[["ticker", "resolved", "Media annua (5Y)", "CAGR (≈5Y)", "Anni osservati", "Metrica usata"]], use_container_width=True, hide_index=True)
+            st.dataframe(tmp[["ticker", "resolved", "Media annua (5Y)", "CAGR (≈5Y)", "Anni osservati", "Metrica usata"]], width='stretch', hide_index=True)
 
             st.caption("""
             ℹ️ **Nota**: i rendimenti storici degli ETF sono tipicamente **già al netto del TER**. Qui usiamo
@@ -688,7 +688,7 @@ if run:
             ))
 
         fig.update_layout(height=460, legend_title_text="", margin=dict(t=40,l=10,r=10,b=10))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     else:
         st.line_chart(monthly_df.set_index("Data")[ ["Investito cumulato", "Valore lordo", "Valore netto"] ])
 
@@ -706,7 +706,7 @@ if run:
     for c in money_cols:
         pretty_yearly[c] = pretty_yearly[c].apply(lambda v: eur(v) if pd.notnull(v) else v)
 
-    st.dataframe(pretty_yearly, use_container_width=True, hide_index=True)
+    st.dataframe(pretty_yearly, width='stretch', hide_index=True)
 
 
     # Download raw data
@@ -715,7 +715,7 @@ if run:
         data=yearly_df.to_csv(index=False).encode("utf-8"),
         file_name="simulazione_pac_annuale.csv",
         mime="text/csv",
-        use_container_width=True,
+        width='stretch',
     )
 else:
     st.info("Configura i parametri nella sidebar e clicca **Esegui simulazione**.")
